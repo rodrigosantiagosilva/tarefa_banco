@@ -27,13 +27,13 @@ $app->get('/usuario/{id}/tarefas',
     $response->getBody()->write(json_encode($tarefas));
     return $response;
   });
-$app->get('/usuario/{id}/usuarios',
+$app->get('/usuario/{id}',
   function (Request $request, Response $response, array $args) use($banco){
     $id = $args['id'];
     $usuario = new Usuario($banco->getConnection());
     $usuarios = $usuario ->getUsuarioById($id);
     $response->getBody()->write(json_encode($usuarios));
-    return $response;
+    return $response -> withHeader('Content-Type','application/json');
   });
 
 $app->post('/usuario',

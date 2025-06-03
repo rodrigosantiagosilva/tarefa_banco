@@ -134,3 +134,8 @@ Mostra a tarefa
 use "nomedatabase"; 
 
 ```
+### Mostrar usuarios do banco 
+```sql
+SELECT * FROM usuario; 
+
+```
