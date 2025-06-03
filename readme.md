@@ -90,27 +90,47 @@ drop database nome_banco;
 ```sql
 show database nome_banco;
 ```
-## Criar Colunas:
-#### Usuário:
+## Criar Tabelas:
+### Tabela: 
 ```sql
----Tabela usuário
-create table usuario(
-    id int not null primary key auto_increment
+--- Tabela de Usuario
+create table usuario (
+    id int not null primary key auto_increment,
     nome varchar(100) not null,
     login varchar (50) not null unique,
     senha varchar (255) not null,
-    email varchar (255) not null unique,
-    foto_path varchar (255) null
-)
-```
-#### Tarefa:
-```sql
----Tabela tarefa
-create table tarefa(
-    id int not null primary key auto_increment
+    email varchar(255) not null unique,
+    foto_path varchar(255) null
+);
+ 
+--- Tabela de Tarefa
+create table tarefa (
+    id int not null primary key auto_increment,
     titulo varchar(255) not null,
-    descricao text not null,
-    status tinyint (1) not null,
-    user_id int not null
-)
+    descricao text not null unique,
+    status TINYINT(1) NOT NULL,
+    user_id INT NOT NULL,
+    CONSTRAINT fk_usuario_tarefa FOREIGN KEY (user_id) REFERENCES usuario(id) -- LAÇO DE LIGAÇÃO
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+```
+### Ubuntu:
+```sql
+sudo systemctl status mariadb para ver se o servidor ta dorando
+
+```
+
+### DESCRIBE:
+```sql
+describe "nometabela"; 
+
+```
+Mostra a tarefa
+
+### Usar 
+```sql
+use "nomedatabase"; 
+
 ```

@@ -1,50 +1,93 @@
 <?php
+use App\Models\Usuario;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Exception\HttpNotFoundException;
 use Slim\Factory\AppFactory;
-
-require __DIR__ . '/vendor/autoload.php';
-
-/**
- * Instantiate App
- *
- * In order for the factory to work you need to ensure you have installed
- * a supported PSR-7 implementation of your choice e.g.: Slim PSR-7 and a supported
- * ServerRequest creator (included with Slim PSR-7)
- */
+use App\Database\Mariadb; 
+use App\Models\Tarefa;
+require __DIR__ . './vendor/autoload.php'; // se der erro, use __DIR__ . '/vendor/autoload.php';
+ 
+ 
 $app = AppFactory::create();
+$banco = new Mariadb();
+$app->get('/usuario/{id}/tarefas',
+  function (Request $request, Response $response, array $args) use($banco){
+    $user_id =$args['id'];
+    $tarefa = new Tarefa($banco->getConnection());
+    $tarefas = $tarefa ->getAllByUser($user_id);
+    $response->getBody()->write(json_encode($tarefas));
+    return $response;
+  });
 
-/**
-  * The routing middleware should be added earlier than the ErrorMiddleware
-  * Otherwise exceptions thrown from it will not be handled by the middleware
-  */
-$app->addRoutingMiddleware();
+  $app->post('/usuario/tarefas',
+  function (Request $request, Response $response, array $args) use($banco){
+    $tarefa = new Tarefa($banco->getConnection());
+    $tarefas = $tarefa ->create();
+    $response->getBody()->write(json_encode($tarefas));
+    return $response;
+  });
+$app->get('/usuario/{id}/usuarios',
+  function (Request $request, Response $response, array $args) use($banco){
+    $id = $args['id'];
+    $usuario = new Usuario($banco->getConnection());
+    $usuarios = $usuario ->getUsuarioById($id);
+    $response->getBody()->write(json_encode($usuarios));
+    return $response;
+  });
 
-/**
- * Add Error Middleware
- *
- * @param bool                  $displayErrorDetails -> Should be set to false in production
- * @param bool                  $logErrors -> Parameter is passed to the default ErrorHandler
- * @param bool                  $logErrorDetails -> Display error details in error log
- * @param LoggerInterface|null  $logger -> Optional PSR-3 Logger  
- *
- * Note: This middleware should be added last. It will not handle any exceptions/errors
- * for middleware added after it.
- */
+$app->post('/usuario',
+  function (Request $request, Response $response, array $args) use($banco){
+    $campos_obrigatorios = ['nome',"login",'senha',"email"];
+    $body = $request->getParsedBody();
+    try{
+      $usuario = new Usuario($banco->getConnection());
+      $usuario->nome = $body["nome"] ?? '';
+      $usuario->email = $body["email"] ?? '';
+      $usuario->senha = $body["senha"] ?? '';
+      $usuario->login = $body["login"] ?? '';
+      $usuario->foto_path = $body["foto_path"] ?? '';
+      foreach($campos_obrigatorios as $campo){
+        if(empty($usuario->{$campo})){
+          throw new \Exception("o campo {$campo} é obrigatório");
+        };
+      }
+      $usuario->create();
+    }catch(\Exception $e){
+      $response->getBody()->write(json_encode(['massage' => $e->getMessage() ]));
+      return $response->withHeader('Content-Type','application/json') ->withStatus(400);
+    }
+    $response->getBody()->write(json_encode([
+      'message' => 'Usuario cadastrado com sucesso'
+    ]));
+    return $response->withHeader('Content-Type','application/json');
+  });
+
+
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
-
-// Define app routes
+$errorMiddleware->setErrorHandler(HttpNotFoundException::class, function (
+    Request $request,
+    Throwable $expection,
+    bool $diplayErrorDetails,
+    bool $logErrors,
+    bool $logErrorDetails
+) use ($app) {
+    $response = $app->getResponseFactory()->createResponse();
+    $response->getBody()->write('{"error": "abacaxi com pimenta!"}');
+    return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+});
+$app->addErrorMiddleware(true, true, true);
+ 
+$app->get('/', function (Request $request, Response $response) {
+    $response->getBody()->write('<a href="/hello/world">Try /hello/world</a>');
+    return $response;
+});
+ 
 $app->get('/hello/{name}', function (Request $request, Response $response, $args) {
     $name = $args['name'];
     $response->getBody()->write("Hello, $name");
     return $response;
 });
-
-
-
-
-
-
-
-// Run app
+ 
+ 
 $app->run();
