@@ -11,6 +11,7 @@ require __DIR__ . './vendor/autoload.php'; // se der erro, use __DIR__ . '/vendo
  
 $app = AppFactory::create();
 $banco = new Mariadb();
+
 $app->get('/usuario/{id}/tarefas',
   function (Request $request, Response $response, array $args) use($banco){
     $user_id =$args['id'];
@@ -20,19 +21,94 @@ $app->get('/usuario/{id}/tarefas',
     return $response;
   });
 
-  $app->post('/usuario/tarefas',
+  $app->post('/tarefa',
   function (Request $request, Response $response, array $args) use($banco){
-    $tarefa = new Tarefa($banco->getConnection());
-    $tarefas = $tarefa ->create();
-    $response->getBody()->write(json_encode($tarefas));
-    return $response;
+$campos_obrigatorios = ['titulo',"descricao",'status',"user_id"];
+    $body = $request->getParsedBody();
+    try{
+      $tarefa = new Tarefa($banco->getConnection());
+      $tarefa->titulo = $body["titulo"] ?? '';
+      $tarefa->descricao = $body["descricao"] ?? '';
+      $tarefa->status = $body["status"] ?? 'false';
+      $tarefa->login = $body["login"] ?? '';
+      $tarefa->foto_path = $body["foto_path"] ?? '';
+      $tarefa->user_id = $body["user_id"] ?? '';
+      foreach($campos_obrigatorios as $campo){
+        if(empty($tarefa->{$campo})){
+          throw new \Exception("o campo {$campo} é obrigatório");
+        };
+      }
+      $tarefa->create();
+    }catch(\Exception $e){
+      $response->getBody()->write(json_encode(['massage' => $e->getMessage() ]));
+      return $response->withHeader('Content-Type','application/json') ->withStatus(400);
+    }
+    $response->getBody()->write(json_encode([
+      'message' => 'Tarefa cadastrada com sucesso'
+    ]));
+    return $response->withHeader('Content-Type','application/json');
   });
-$app->get('/usuario/{id}',
+
+
+
+$app->put('/tarefa/{id}',
+  function (Request $request, Response $response, array $args) use($banco){
+    $campos_obrigatorios = ['titulo',"descricao",'user_id',"status"];
+    $body = json_decode($request->getBody()->getContents(), true);
+    try{
+      $tarefa = new Tarefa($banco->getConnection());
+      $tarefa->id = $args["id"];
+      $tarefa->titulo = $body["titulo"] ?? '';
+      $tarefa->status = $body["status"] ?? '';
+      $tarefa->user_id = $body["user_id"] ?? '';
+      $tarefa->descricao = $body["descricao"] ?? '';
+      foreach($campos_obrigatorios as $campo){
+        if(empty($tarefa->{$campo})){
+          throw new \Exception("o campo {$campo} é obrigatório");
+        };
+      }
+      $tarefa->update();
+    }catch(\Exception $e){
+      $response->getBody()->write(json_encode(['massage' => $e->getMessage() ]));
+      return $response->withHeader('Content-Type','application/json') ->withStatus(400);
+    }
+    $response->getBody()->write(json_encode([
+      'message' => 'Tarefa atualizada com sucesso'
+    ]));
+    return $response->withHeader('Content-Type','application/json');
+  });
+
+
+
+  $app->delete('/tarefa/{id}',
+  function (Request $request, Response $response, array $args) use($banco){
+    $id = $args['id'];
+    $usuario = new Tarefa($banco->getConnection());
+    $usuario ->delete($id);
+    $response->getBody()->write(json_encode(['massage' =>'Tarefa deletada']));
+    return $response -> withHeader('Content-Type','application/json');
+  });
+
+
+
+
+$app->get('/tarefa/{id}',
+  function (Request $request, Response $response, array $args) use($banco){
+    $id = $args['id'];
+    $usuario = new Tarefa($banco->getConnection());
+    $usuarios = $usuario ->getTarefasById($id);
+    $response->getBody()->write(json_encode($usuarios));
+    return $response -> withHeader('Content-Type','application/json');
+  });
+
+
+
+$app->delete('/usuario/{id}',
   function (Request $request, Response $response, array $args) use($banco){
     $id = $args['id'];
     $usuario = new Usuario($banco->getConnection());
-    $usuarios = $usuario ->getUsuarioById($id);
-    $response->getBody()->write(json_encode($usuarios));
+    $usuario ->delete($id);
+    $response->getBody()->write(json_encode(['massage' =>'Usuário deletado']));
     return $response -> withHeader('Content-Type','application/json');
   });
 
@@ -64,6 +140,44 @@ $app->post('/usuario',
   });
 
 
+
+
+
+
+$app->put('/usuario/{id}',
+  function (Request $request, Response $response, array $args) use($banco){
+    $campos_obrigatorios = ['nome',"login",'senha',"email"];
+    $body = json_decode($request->getBody()->getContents(), true);
+    try{
+      $usuario = new Usuario($banco->getConnection());
+      $usuario->id = $args["id"];
+      $usuario->nome = $body["nome"] ?? '';
+      $usuario->email = $body["email"] ?? '';
+      $usuario->senha = $body["senha"] ?? '';
+      $usuario->login = $body["login"] ?? '';
+      $usuario->foto_path = $body["foto_path"] ?? '';
+      foreach($campos_obrigatorios as $campo){
+        if(empty($usuario->{$campo})){
+          throw new \Exception("o campo {$campo} é obrigatório");
+        };
+      }
+      $usuario->update();
+    }catch(\Exception $e){
+      $response->getBody()->write(json_encode(['massage' => $e->getMessage() ]));
+      return $response->withHeader('Content-Type','application/json') ->withStatus(400);
+    }
+    $response->getBody()->write(json_encode([
+      'message' => 'Usuario atualizado com sucesso'
+    ]));
+    return $response->withHeader('Content-Type','application/json');
+  });
+
+
+
+
+
+
+
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 $errorMiddleware->setErrorHandler(HttpNotFoundException::class, function (
     Request $request,
@@ -73,21 +187,8 @@ $errorMiddleware->setErrorHandler(HttpNotFoundException::class, function (
     bool $logErrorDetails
 ) use ($app) {
     $response = $app->getResponseFactory()->createResponse();
-    $response->getBody()->write('{"error": "abacaxi com pimenta!"}');
+    $response->getBody()->write('{"error": "DEU MERDA!!!!"}');
     return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
 });
 $app->addErrorMiddleware(true, true, true);
- 
-$app->get('/', function (Request $request, Response $response) {
-    $response->getBody()->write('<a href="/hello/world">Try /hello/world</a>');
-    return $response;
-});
- 
-$app->get('/hello/{name}', function (Request $request, Response $response, $args) {
-    $name = $args['name'];
-    $response->getBody()->write("Hello, $name");
-    return $response;
-});
- 
- 
 $app->run();

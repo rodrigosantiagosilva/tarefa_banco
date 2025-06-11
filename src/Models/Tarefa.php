@@ -31,18 +31,20 @@ public function getTarefasById(int $id): ?array
     $stmt->execute([':id' => $id]);
     return $stmt->fetch();
 } 
-
-public function update(): bool
-{
-    $sql = "UPDATE tarefa SET titulo = :titulo, descricao = :descricao,status =:status, user_id = :user_id WHERE id =:id";
-    $stmt = $this ->connection->prepare($sql);
-    return $stmt->execute([
-        ':id' =>$this->id,
-        ':titulo'=> $this->titulo,
-        ':descricao'=> $this->descricao,
-        ':status'=> $this->status,
-        ':user_id'=> $this->user_id]);
-}
+ public function update(): bool
+    {
+        $sql = "UPDATE tarefa SET titulo = :titulo, descricao = :descricao, 
+            status = :status, user_id = :user_id
+            WHERE id = :id";
+        $stmt = $this->connection->prepare($sql);
+        return $stmt->execute([
+            ':id' => $this->id,
+            ':titulo' => $this->titulo,
+            ':descricao' => $this->descricao,
+            ':status' => $this->status,
+            ':user_id' => $this->user_id,
+        ]);
+    }
 
 public function delete(int $id): bool
 {

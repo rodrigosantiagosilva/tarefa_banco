@@ -71,7 +71,7 @@ mysql -uroot -p
 
 # Mostrar database 
 ```sql
-show database;
+show databases;
 ```
 
 # Comandos mariadb:
