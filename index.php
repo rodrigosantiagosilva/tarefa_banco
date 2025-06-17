@@ -57,11 +57,12 @@ $app->put('/tarefa/{id}',
       $tarefa = new Tarefa($banco->getConnection());
       $tarefa->id = $args["id"];
       $tarefa->titulo = $body["titulo"] ?? '';
-      $tarefa->status = $body["status"] ?? '';
-      $tarefa->user_id = $body["user_id"] ?? '';
+      $tarefa->status = $body["status"] ?? false;
+      // $tarefa->status = filter_var($body["status"], FILTER_VALIDATE_BOOLEAN) ?? false;
+      $tarefa->user_id = $body["user_id"] ?? 0;
       $tarefa->descricao = $body["descricao"] ?? '';
       foreach($campos_obrigatorios as $campo){
-        if(empty($tarefa->{$campo})){
+        if(empty($tarefa->{$campo})&& $campo !== 'status'){
           throw new \Exception("o campo {$campo} é obrigatório");
         };
       }
@@ -99,7 +100,14 @@ $app->get('/tarefa/{id}',
     return $response -> withHeader('Content-Type','application/json');
   });
 
-
+$app->get('/usuario/{id}',
+  function (Request $request, Response $response, array $args) use($banco){
+    $id = $args['id'];
+    $usuario = new Usuario($banco->getConnection());
+    $usuarios = $usuario ->getUsuarioById($id);
+    $response->getBody()->write(json_encode($usuarios));
+    return $response -> withHeader('Content-Type','application/json');
+  });
 
 $app->delete('/usuario/{id}',
   function (Request $request, Response $response, array $args) use($banco){

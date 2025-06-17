@@ -70,8 +70,6 @@ class Usuario
     }
 
 
-    // criar a propriedade da conexão igual à classe tarefa - OK
-    // Criar o método construtor igual à tarefa - OK
-    // criar os métodos create, findById, update e delete para gerenciar os usuários
+
     
 }
