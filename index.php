@@ -29,7 +29,7 @@ $campos_obrigatorios = ['titulo',"descricao",'status',"user_id"];
       $tarefa = new Tarefa($banco->getConnection());
       $tarefa->titulo = $body["titulo"] ?? '';
       $tarefa->descricao = $body["descricao"] ?? '';
-      $tarefa->status = $body["status"] ?? 'false';
+      $tarefa->status = $body["status"] ?? false;
       $tarefa->user_id = $body["user_id"] ?? '';
       foreach($campos_obrigatorios as $campo){
         if(empty($tarefa->{$campo})){

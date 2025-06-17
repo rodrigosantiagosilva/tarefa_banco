@@ -20,7 +20,7 @@ class Tarefa{
     return $stmt->execute([
         ":titulo"=> $this->titulo,
         ":descricao"=> $this->descricao,
-        ":status"=> $this->status,
+        ":status"=> (int)$this->status,
         ":user_id"=> $this->user_id
     ]);
 }
