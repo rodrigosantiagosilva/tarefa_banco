@@ -30,8 +30,6 @@ $campos_obrigatorios = ['titulo',"descricao",'status',"user_id"];
       $tarefa->titulo = $body["titulo"] ?? '';
       $tarefa->descricao = $body["descricao"] ?? '';
       $tarefa->status = $body["status"] ?? 'false';
-      $tarefa->login = $body["login"] ?? '';
-      $tarefa->foto_path = $body["foto_path"] ?? '';
       $tarefa->user_id = $body["user_id"] ?? '';
       foreach($campos_obrigatorios as $campo){
         if(empty($tarefa->{$campo})){
