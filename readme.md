@@ -139,3 +139,9 @@ use "nomedatabase";
 SELECT * FROM usuario; 
 
 ```
+
+# Fazer frontend com phpslim 
+```bash
+composer require slim/php-view
+
+```
