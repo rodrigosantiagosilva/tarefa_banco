@@ -1,6 +1,12 @@
 <?php
+
+use App\Models\Usuario;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use App\Models\Tarefa;
+
 $app->get('/usuario/{id}/tarefas',
-  function (Request $request, Response $response, array $args) use($banco){
+  function (Request $request, Response $response, array $args) use ($banco){
     $user_id =$args['id'];
     $tarefa = new Tarefa($banco->getConnection());
     $tarefas = $tarefa ->getAllByUser($user_id);
@@ -166,6 +172,39 @@ $app->put('/usuario/{id}',
   });
 
 
+$app->post('/login',
+  function (Request $request, Response $response, array $args) use($banco){
+    $campos_obrigatorios = ['login',"senha"];
+    $body = json_decode($request->getBody()->getContents(), true);
+
+    $login_fake = 'marmota';
+    $senha_fake = 'senha123';
+
+    try{
+   
+
+      foreach($campos_obrigatorios as $campo){
+
+        if(!isset($body[$campo]) || empty($body[$campo])){
+          throw new \Exception("login ou senha vazios");
+        }
+      }
+        if($body['login'] !== $login_fake || $body['senha'] !== $senha_fake){
+         throw new \Exception("login ou senha inválidos");
+      }
+      $response->getBody()->write(json_encode([
+        'massage' => 'login realizado',
+        'status' => true
+    ]));
+    return $response->withHeader('Content-Type','application/json');
+    }catch(\Exception $e){
+      $response->getBody()->write(json_encode([
+        'massage' => $e->getMessage(),
+        'status' => false
+    ]));
+      return $response->withHeader('Content-Type','application/json') ->withStatus(400);
+    }
+  });
 
 
 
