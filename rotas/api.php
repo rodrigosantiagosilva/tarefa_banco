@@ -177,19 +177,18 @@ $app->post('/login',
     $campos_obrigatorios = ['login',"senha"];
     $body = json_decode($request->getBody()->getContents(), true);
 
-    $login_fake = 'marmota';
-    $senha_fake = 'senha123';
 
     try{
    
 
       foreach($campos_obrigatorios as $campo){
-
         if(!isset($body[$campo]) || empty($body[$campo])){
           throw new \Exception("login ou senha vazios");
         }
       }
-        if($body['login'] !== $login_fake || $body['senha'] !== $senha_fake){
+        $usuario = new Usuario($banco->getConnection());
+        $login = $usuario->fazerLogin($body['login'],$body['senha']);
+        if(empty($login)){
          throw new \Exception("login ou senha inválidos");
       }
       $response->getBody()->write(json_encode([
@@ -205,8 +204,3 @@ $app->post('/login',
       return $response->withHeader('Content-Type','application/json') ->withStatus(400);
     }
   });
-
-
-
-
-

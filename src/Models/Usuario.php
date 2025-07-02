@@ -69,6 +69,24 @@ class Usuario
         return $stmt->execute([':id' => $id]);
     }
 
+    public function fazerLogin(string $login, string $senha) : array
+    {
+        $sql = "SELECT * FROM usuario WHERE login = :login";
+        $stmt = $this->conexao->prepare($sql);
+        $stmt->execute([
+            ':login' => $login,
+        ]);
+
+        $resultado = $stmt->fetch();
+        if($resultado){
+            if(password_verify($senha,$resultado['senha'])){
+            unset($resultado['senha']);
+            }
+            return $resultado;
+        }
+        
+        return [];
+    }
 
 
     

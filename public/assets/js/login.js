@@ -20,7 +20,9 @@ btnEntrar.onclick = () =>{
     .then(response => {
         if(response.status == false){
             msg_erro.style.display ='block';
+            return;
         }
+        window.location.assign('/home');
     }).catch(error => console.error(error));
 
 }

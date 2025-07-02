@@ -12,7 +12,7 @@ $app->get('/cadastrar', function ($request, $response) {
     return $renderer->render($response, 'cadastrar.php');
 });
 
-$app->get('/recuperar_senha', function ($request, $response) {
-    $renderer = new PhpRenderer('/view/login');
-    return $renderer->render($response, 'recuperar_senha.php');
+$app->get('/home', function ($request, $response) {
+    $renderer = new PhpRenderer(__DIR__ . '/../views');
+    return $renderer->render($response, 'tarefa/listar.php');
 });
