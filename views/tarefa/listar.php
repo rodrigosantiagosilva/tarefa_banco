@@ -1,5 +1,13 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-<h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+</head>
+<body>
+    <h1>
     <?php echo $usuario['nome'] ?? ''?>
     <a id="btn_logout" href="/logout">Sair</a>
 </h1>
@@ -30,5 +38,6 @@ foreach($tarefas as $tarefa){
 
 ?>
 </tbody>
-
 </table>
+</body>
+</html>
