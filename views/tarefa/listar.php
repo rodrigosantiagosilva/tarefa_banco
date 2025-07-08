@@ -1,11 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOME</title>
-</head>
-<body>
-    
-</body>
-</html>
+<h1>
+    <?php echo $usuario['nome'] ?? ''?>
+    <a id="btn_logout" href="/logout">Sair</a>
+</h1>
+<table>
+    <thead>
+        <tr>
+            <td>id</td> <td>titulo</td> <td>descricao</td>
+        </tr>
+    </thead>
+<tbody>
+    <?php
+foreach($tarefas as $tarefa){
+    echo "<tr> <td>{$tarefa['id']}</td> <td>{$tarefa['titulo']}</td>
+    <td>{$tarefa['descricao']}</td> </tr>";
+}
+
+
+
+
+?>
+</tbody>
+
+</table>

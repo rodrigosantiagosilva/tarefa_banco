@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\SessaoUsuario;
 use App\Models\Usuario;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -176,8 +177,6 @@ $app->post('/login',
   function (Request $request, Response $response, array $args) use($banco){
     $campos_obrigatorios = ['login',"senha"];
     $body = json_decode($request->getBody()->getContents(), true);
-
-
     try{
    
 
@@ -191,6 +190,8 @@ $app->post('/login',
         if(empty($login)){
          throw new \Exception("login ou senha inválidos");
       }
+      $sessao = SessaoUsuario::getInstancia();
+      $sessao-> login($login);
       $response->getBody()->write(json_encode([
         'massage' => 'login realizado',
         'status' => true
